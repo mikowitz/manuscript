@@ -28,52 +28,35 @@ defmodule Manuscript.Lilypond do
   end
 
   def write_lilypond(staves) do
-    groups =
-      Enum.chunk_by(staves, & &1.template.family)
-      |> Enum.map_join("\n", fn family ->
-        case family do
-          [] ->
-            ""
+    File.read!(Path.join(:code.priv_dir(:manuscript), "lilypond/score_template.ly"))
+    |> String.replace("__LILYPOND_VERSION__", @lilypond_version)
+    |> String.replace("__GROUPS__", staff_groups(staves))
+  end
 
-          instruments ->
-            """
-            \\new StaffGroup <<
-              #{Enum.map_join(instruments, "\n", &Instrument.staff/1)}
-            >>
-            """
-        end
-      end)
+  defp staff_groups(staves) do
+    staff_count = staves |> Enum.map(&Instrument.Template.staff_count(&1.template)) |> Enum.sum()
 
-    """
-    \\version "#{@lilypond_version}"
+    measures =
+      case staff_count do
+        n when n < 4 -> "s1 \\break s1 \\break s1 \\break s1"
+        n when n < 6 -> "s1 \\break s1 \\break s1"
+        n when n < 9 -> "s1 \\break s1"
+        _ -> "s1"
+      end
 
+    Enum.chunk_by(staves, & &1.template.family)
+    |> Enum.map_join("\n", fn family ->
+      case family do
+        [] ->
+          ""
 
-    #(set-default-paper-size "tabloidlandscape")
-
-    \\paper {
-      ragged-right = ##f
-      ragged-last-right = ##f
-      ragged-last-bottom = ##f
-      ragged-bottom = ##f
-      tagline = ##f
-      padding = 0
-      right-margin = .5\\in
-      left-margin = .5\\in
-    }
-
-    \\score {
-      <<
-      #{groups}
-      >>
-    }
-
-    \\layout {
-      \\context {
-        \\Score
-        \\omit TimeSignature
-
-      }
-    }
-    """
+        instruments ->
+          """
+          \\new StaffGroup <<
+            #{Enum.map_join(instruments, "\n", &Instrument.staff(&1, measures))}
+          >>
+          """
+      end
+    end)
   end
 end

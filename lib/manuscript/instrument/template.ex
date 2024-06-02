@@ -1,6 +1,9 @@
 defmodule Manuscript.Instrument.Template do
   defstruct [:name, :clef, :family, :index]
 
+  def staff_count(%__MODULE__{clef: "piano"}), do: 2
+  def staff_count(%__MODULE__{}), do: 1
+
   def by_name(name), do: Enum.find(all(), &(&1.name == name))
 
   def matching(text) do

@@ -77,13 +77,23 @@ defmodule ManuscriptWeb.ManuscriptLive do
   end
 
   def reset(socket, resp \\ :noreply) do
+    insts =
+      Enum.map(
+        # , "Piano", "Violin", "Viola", "Cello"],
+        ["Contrabass Saxophone", "Oboe"],
+        # [],
+        &Instrument.new(Template.by_name(&1))
+      )
+      |> Enum.sort_by(& &1.template.index)
+
     {resp,
      assign(socket,
        search_term: "",
        search_results: [],
-       instruments: [],
-       score: nil,
-       pdf_score: nil,
+       instruments: insts,
+       # instruments: [],
+       score: generate_png(insts),
+       pdf_score: generate_pdf(insts),
        generating: false
      )}
   end
