@@ -13,7 +13,7 @@
 
 <datalist id="instruments">
   <%= for inst <- @search_results do %>
-    <option phx-click="add_instrument" value={inst}><%= inst %></option>
+    <option phx-click="add_instrument" value={inst.name}><%= inst.name %></option>
   <% end %>
 </datalist>
 
@@ -29,7 +29,7 @@
           <a href="#" phx-click="delete_instrument" phx-value-id={inst.id} class="text-red-500">
             [x]
           </a>
-          <%= inst.name %>
+          <%= inst.template.name %>
         </li>
       <% end %>
     </ul>

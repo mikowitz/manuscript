@@ -1,6 +1,8 @@
 defmodule ManuscriptWeb.ManuscriptLive do
-  alias Manuscript.Instrument
   use ManuscriptWeb, :live_view
+
+  alias Manuscript.Instrument
+  alias Manuscript.Instrument.Template
 
   def mount(_params, _session, socket) do
     {:ok,
@@ -15,12 +17,14 @@ defmodule ManuscriptWeb.ManuscriptLive do
   end
 
   def handle_event("autocomplete", %{"instrument" => instrument}, socket) do
-    instruments = Instrument.matching(instrument)
+    instruments = Template.matching(instrument)
     {:noreply, assign(socket, search_results: instruments, search_term: instrument)}
   end
 
   def handle_event("add_instrument", %{"instrument" => instrument}, socket) do
-    if instrument in Instrument.instruments() do
+    instrument = Template.by_name(instrument)
+
+    if instrument do
       new_instruments = [Instrument.new(instrument) | socket.assigns.instruments]
       send(self(), {:generate_lilypond, new_instruments})
 
