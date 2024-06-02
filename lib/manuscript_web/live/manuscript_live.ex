@@ -15,12 +15,12 @@ defmodule ManuscriptWeb.ManuscriptLive do
   end
 
   def handle_event("autocomplete", %{"instrument" => instrument}, socket) do
-    instruments = Manuscript.Instruments.matching(instrument)
+    instruments = Instrument.matching(instrument)
     {:noreply, assign(socket, search_results: instruments, search_term: instrument)}
   end
 
   def handle_event("add_instrument", %{"instrument" => instrument}, socket) do
-    if instrument in Manuscript.Instruments.instruments() do
+    if instrument in Instrument.instruments() do
       new_instruments = [Instrument.new(instrument) | socket.assigns.instruments]
       send(self(), {:generate_lilypond, new_instruments})
 
