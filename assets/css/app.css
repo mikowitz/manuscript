@@ -9,6 +9,19 @@
   @apply bg-green-400
 }
 
-.download-button {
-  @apply text-white bg-green-600 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none hover:bg-green-800
+.buttons {
+  @apply content-center mt-5 mb-5 text-center
 }
+
+.download-button {
+  @apply text-white bg-green-600 font-medium rounded-lg text-sm px-5 py-2 focus:outline-none hover:bg-green-800
+}
+
+#clear-buttons {
+  @apply content-center mt-5
+}
+
+.clear-button {
+  @apply text-white bg-red-600 font-medium rounded-lg text-sm px-5 py-2 focus:outline-none hover:bg-red-800
+}
+

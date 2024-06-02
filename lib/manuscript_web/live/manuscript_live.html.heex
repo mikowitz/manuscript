@@ -21,23 +21,27 @@
   <div class="text-white font-bold">Generating lilypond...</div>
 </.modal>
 
-<div class="grid grid-cols-2">
-  <div>
-    <ul>
-      <%= for inst <- @instruments do %>
-        <li class="border-2 rounded-lg px-2 py-2 mr-10 ml-5 mt-5">
-          <a href="#" phx-click="delete_instrument" phx-value-id={inst.id} class="text-red-500">
-            [x]
-          </a>
-          <%= inst.template.name %>
-        </li>
-      <% end %>
-    </ul>
-  </div>
-  <%= if @score do %>
+<%= if @score do %>
+  <div class="grid grid-cols-2">
+    <div id="instrument-list">
+      <div class="buttons">
+        <a phx-click="clear_score" class="clear-button">
+          Clear
+        </a>
+      </div>
+      <ul>
+        <%= for inst <- @instruments do %>
+          <li class="border-2 rounded-lg px-2 py-2 mr-10 ml-2 mt-2">
+            <a href="#" phx-click="delete_instrument" phx-value-id={inst.id} class="text-red-500">
+              [x]
+            </a>
+            <%= inst.template.name %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
     <div id="score">
-      <br />
-      <div class="mb-5 text-center" id="buttons">
+      <div class="buttons">
         <a download href={@pdf_score} class="download-button">
           Download (PDF)
         </a>
@@ -48,5 +52,5 @@
       </div>
       <img class="border-2" src={@score} />
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>

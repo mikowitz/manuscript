@@ -28,6 +28,22 @@ defmodule Manuscript.Lilypond do
   end
 
   def write_lilypond(staves) do
+    groups =
+      Enum.chunk_by(staves, & &1.template.family)
+      |> Enum.map_join("\n", fn family ->
+        case family do
+          [] ->
+            ""
+
+          instruments ->
+            """
+            \\new StaffGroup <<
+              #{Enum.map_join(instruments, "\n", &Instrument.staff/1)}
+            >>
+            """
+        end
+      end)
+
     """
     \\version "#{@lilypond_version}"
 
@@ -39,7 +55,7 @@ defmodule Manuscript.Lilypond do
 
     \\score {
       <<
-      #{Enum.map_join(staves, "\n", &Instrument.staff/1)}
+      #{groups}
       >>
     }
 
@@ -53,4 +69,3 @@ defmodule Manuscript.Lilypond do
     """
   end
 end
-

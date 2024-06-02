@@ -5,15 +5,11 @@ defmodule ManuscriptWeb.ManuscriptLive do
   alias Manuscript.Instrument.Template
 
   def mount(_params, _session, socket) do
-    {:ok,
-     assign(socket,
-       search_term: "",
-       search_results: [],
-       instruments: [],
-       score: nil,
-       pdf_score: nil,
-       generating: false
-     )}
+    reset(socket, :ok)
+  end
+
+  def handle_event("clear_score", _, socket) do
+    reset(socket)
   end
 
   def handle_event("autocomplete", %{"instrument" => instrument}, socket) do
@@ -78,5 +74,17 @@ defmodule ManuscriptWeb.ManuscriptLive do
       Manuscript.Lilypond.generate_lilypond(staves)
     end)
     |> Task.await()
+  end
+
+  def reset(socket, resp \\ :noreply) do
+    {resp,
+     assign(socket,
+       search_term: "",
+       search_results: [],
+       instruments: [],
+       score: nil,
+       pdf_score: nil,
+       generating: false
+     )}
   end
 end
