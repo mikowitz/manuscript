@@ -47,10 +47,18 @@ defmodule Manuscript.Lilypond do
     """
     \\version "#{@lilypond_version}"
 
+
+    #(set-default-paper-size "tabloidlandscape")
+
     \\paper {
       ragged-right = ##f
       ragged-last-right = ##f
+      ragged-last-bottom = ##f
+      ragged-bottom = ##f
       tagline = ##f
+      padding = 0
+      right-margin = .5\\in
+      left-margin = .5\\in
     }
 
     \\score {

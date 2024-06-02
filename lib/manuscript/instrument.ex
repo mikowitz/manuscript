@@ -8,7 +8,7 @@ defmodule Manuscript.Instrument do
   def staff(%__MODULE__{template: %{name: name, clef: "piano"}}) do
     """
     \\new PianoStaff \\with {
-      instrumentName = "#{name}"
+      instrumentName = "#{name} "
     } <<
       \\new Staff { \\clef "treble" s1 }
       \\new Staff { \\clef "bass" s1 }
@@ -18,7 +18,7 @@ defmodule Manuscript.Instrument do
 
   def staff(%__MODULE__{template: template}) do
     """
-    \\new Staff \\with { instrumentName = "#{template.name}" } { \\clef "#{template.clef}" s1 }
+    \\new Staff \\with { instrumentName = "#{template.name} " } { \\clef "#{template.clef}" s1 }
     """
   end
 end

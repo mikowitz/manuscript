@@ -47,6 +47,7 @@ defmodule Manuscript.Instrument.Template do
       # PERCUSSION
       {"Timpani", "bass", "percussion"},
       {"Percussion", "percussion", "percussion"},
+      {"Electronics", "percussion", "percussion"},
 
       # KEYBOARD
       {"Accordion", "piano", "keyboard"},

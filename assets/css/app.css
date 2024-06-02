@@ -6,7 +6,7 @@
 
 /* generating modal */
 #generating-container {
-  @apply bg-green-400
+  @apply bg-green-400 p-6
 }
 
 .buttons {

@@ -1,29 +1,29 @@
-<.form for={nil} phx-change="autocomplete" phx-submit="add_instrument">
-  <div>
-    <.input
-      type="text"
-      name="instrument"
-      id="instrument"
-      value={@search_term}
-      list="instruments"
-      label="Add instrument"
-    />
-  </div>
-</.form>
-
-<datalist id="instruments">
-  <%= for inst <- @search_results do %>
-    <option phx-click="add_instrument" value={inst.name}><%= inst.name %></option>
-  <% end %>
-</datalist>
-
 <.modal :if={@generating} show id="generating">
   <div class="text-white font-bold">Generating lilypond...</div>
 </.modal>
 
-<%= if @score do %>
-  <div class="grid grid-cols-2">
-    <div id="instrument-list">
+<div class="grid grid-cols-3 gap-4 h-96">
+  <div id="instrument-list">
+    <.form for={nil} phx-change="autocomplete" phx-submit="add_instrument">
+      <div>
+        <.input
+          type="text"
+          name="instrument"
+          id="instrument"
+          value={@search_term}
+          list="instruments"
+          label="Add instrument"
+        />
+      </div>
+    </.form>
+
+    <datalist id="instruments">
+      <%= for inst <- @search_results do %>
+        <option phx-click="add_instrument" value={inst.name}><%= inst.name %></option>
+      <% end %>
+    </datalist>
+
+    <%= if @score do %>
       <div class="buttons">
         <a phx-click="clear_score" class="clear-button">
           Clear
@@ -39,8 +39,10 @@
           </li>
         <% end %>
       </ul>
-    </div>
-    <div id="score">
+    <% end %>
+  </div>
+  <%= if @score do %>
+    <div id="score" class="col-span-2">
       <div class="buttons">
         <a download href={@pdf_score} class="download-button">
           Download (PDF)
@@ -50,7 +52,7 @@
           Download (PNG)
         </a>
       </div>
-      <img class="border-2" src={@score} />
+      <img class="border-2 rounded-lg" src={@score} />
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>
