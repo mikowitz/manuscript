@@ -1,43 +1,49 @@
-<.form for={nil} phx-change="autocomplete" phx-submit="add_instrument">
-  <div>
-    <.input
-      type="text"
-      name="instrument"
-      id="instrument"
-      value={@search_term}
-      list="instruments"
-      label="Add instrument"
-    />
-  </div>
-</.form>
-
-<datalist id="instruments">
-  <%= for inst <- @search_results do %>
-    <option phx-click="add_instrument" value={inst}><%= inst %></option>
-  <% end %>
-</datalist>
-
 <.modal :if={@generating} show id="generating">
   <div class="text-white font-bold">Generating lilypond...</div>
 </.modal>
 
-<div class="grid grid-cols-2">
-  <div>
-    <ul>
-      <%= for inst <- @instruments do %>
-        <li class="border-2 rounded-lg px-2 py-2 mr-10 ml-5 mt-5">
-          <a href="#" phx-click="delete_instrument" phx-value-id={inst.id} class="text-red-500">
-            [x]
-          </a>
-          <%= inst.name %>
-        </li>
+<div class="grid grid-cols-3 gap-4 h-96">
+  <div id="instrument-list">
+    <.form for={nil} phx-change="autocomplete" phx-submit="add_instrument">
+      <div>
+        <.input
+          type="text"
+          name="instrument"
+          id="instrument"
+          value={@search_term}
+          list="instruments"
+          label="Add instrument"
+        />
+      </div>
+    </.form>
+
+    <datalist id="instruments">
+      <%= for inst <- @search_results do %>
+        <option phx-click="add_instrument" value={inst.name}><%= inst.name %></option>
       <% end %>
-    </ul>
+    </datalist>
+
+    <%= if @score do %>
+      <div class="buttons">
+        <a phx-click="clear_score" class="clear-button">
+          Clear
+        </a>
+      </div>
+      <ul>
+        <%= for inst <- @instruments do %>
+          <li class="border-2 rounded-lg px-2 py-2 mr-10 ml-2 mt-2">
+            <a href="#" phx-click="delete_instrument" phx-value-id={inst.id} class="text-red-500">
+              [x]
+            </a>
+            <%= inst.template.name %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
   </div>
   <%= if @score do %>
-    <div id="score">
-      <br />
-      <div class="mb-5 text-center" id="buttons">
+    <div id="score" class="col-span-2">
+      <div class="buttons">
         <a download href={@pdf_score} class="download-button">
           Download (PDF)
         </a>
@@ -46,7 +52,7 @@
           Download (PNG)
         </a>
       </div>
-      <img class="border-2" src={@score} />
+      <img class="border-2 rounded-lg" src={@score} />
     </div>
   <% end %>
 </div>

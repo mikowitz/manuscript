@@ -1,23 +1,14 @@
 defmodule Manuscript.Instrument do
-  defstruct [:name, :clef, :id, :family, :index]
+  defstruct [:template, :id]
 
-  def new(name) do
-    %__MODULE__{name: name, clef: clef(name), id: UUID.uuid4()}
+  def new(template) do
+    %__MODULE__{template: template, id: UUID.uuid4()}
   end
 
-  def clef("Viola"), do: "alto"
-  def clef("Bassoon"), do: "bass"
-  def clef("Trombone"), do: "bass"
-  def clef("Tuba"), do: "bass"
-  def clef("Violoncello"), do: "bass"
-  def clef("Double bass"), do: "bass"
-  def clef("Percussion"), do: "percussion"
-  def clef(_), do: "treble"
-
-  def staff(%__MODULE__{name: "Piano"}) do
+  def staff(%__MODULE__{template: %{name: name, clef: "piano"}}) do
     """
     \\new PianoStaff \\with {
-      instrumentName = "Piano"
+      instrumentName = "#{name} "
     } <<
       \\new Staff { \\clef "treble" s1 }
       \\new Staff { \\clef "bass" s1 }
@@ -25,9 +16,17 @@ defmodule Manuscript.Instrument do
     """
   end
 
-  def staff(instrument) do
+  def staff(%__MODULE__{template: template}) do
     """
-    \\new Staff \\with { instrumentName = "#{instrument.name}" } { \\clef "#{instrument.clef}" s1 }
+    \\new Staff \\with { instrumentName = "#{template.name} " } { \\clef "#{template.clef}" s1 }
     """
+  end
+
+  def matching(text) do
+    query = String.replace(text, ~r/[\W\S]/, "")
+
+    Enum.filter(__MODULE__.Template.all(), fn inst ->
+      String.match?(inst, ~r/#{query}/i)
+    end)
   end
 end
