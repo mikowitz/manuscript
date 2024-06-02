@@ -25,7 +25,10 @@ defmodule ManuscriptWeb.ManuscriptLive do
     instrument = Template.by_name(instrument)
 
     if instrument do
-      new_instruments = [Instrument.new(instrument) | socket.assigns.instruments]
+      new_instruments =
+        [Instrument.new(instrument) | socket.assigns.instruments]
+        |> Enum.sort_by(& &1.template.index)
+
       send(self(), {:generate_lilypond, new_instruments})
 
       {:noreply,
