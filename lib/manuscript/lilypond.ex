@@ -28,18 +28,42 @@ defmodule Manuscript.Lilypond do
   end
 
   def write_lilypond(staves) do
+    groups =
+      Enum.chunk_by(staves, & &1.template.family)
+      |> Enum.map_join("\n", fn family ->
+        case family do
+          [] ->
+            ""
+
+          instruments ->
+            """
+            \\new StaffGroup <<
+              #{Enum.map_join(instruments, "\n", &Instrument.staff/1)}
+            >>
+            """
+        end
+      end)
+
     """
     \\version "#{@lilypond_version}"
+
+
+    #(set-default-paper-size "tabloidlandscape")
 
     \\paper {
       ragged-right = ##f
       ragged-last-right = ##f
+      ragged-last-bottom = ##f
+      ragged-bottom = ##f
       tagline = ##f
+      padding = 0
+      right-margin = .5\\in
+      left-margin = .5\\in
     }
 
     \\score {
       <<
-      #{Enum.map_join(staves, "\n", &Instrument.staff/1)}
+      #{groups}
       >>
     }
 
@@ -53,4 +77,3 @@ defmodule Manuscript.Lilypond do
     """
   end
 end
-

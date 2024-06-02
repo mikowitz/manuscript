@@ -1,27 +1,30 @@
 defmodule ManuscriptWeb.ManuscriptLive do
-  alias Manuscript.Instrument
   use ManuscriptWeb, :live_view
 
+  alias Manuscript.Instrument
+  alias Manuscript.Instrument.Template
+
   def mount(_params, _session, socket) do
-    {:ok,
-     assign(socket,
-       search_term: "",
-       search_results: [],
-       instruments: [],
-       score: nil,
-       pdf_score: nil,
-       generating: false
-     )}
+    reset(socket, :ok)
+  end
+
+  def handle_event("clear_score", _, socket) do
+    reset(socket)
   end
 
   def handle_event("autocomplete", %{"instrument" => instrument}, socket) do
-    instruments = Instrument.matching(instrument)
+    instruments = Template.matching(instrument)
     {:noreply, assign(socket, search_results: instruments, search_term: instrument)}
   end
 
   def handle_event("add_instrument", %{"instrument" => instrument}, socket) do
-    if instrument in Instrument.instruments() do
-      new_instruments = [Instrument.new(instrument) | socket.assigns.instruments]
+    instrument = Template.by_name(instrument)
+
+    if instrument do
+      new_instruments =
+        [Instrument.new(instrument) | socket.assigns.instruments]
+        |> Enum.sort_by(& &1.template.index)
+
       send(self(), {:generate_lilypond, new_instruments})
 
       {:noreply,
@@ -71,5 +74,17 @@ defmodule ManuscriptWeb.ManuscriptLive do
       Manuscript.Lilypond.generate_lilypond(staves)
     end)
     |> Task.await()
+  end
+
+  def reset(socket, resp \\ :noreply) do
+    {resp,
+     assign(socket,
+       search_term: "",
+       search_results: [],
+       instruments: [],
+       score: nil,
+       pdf_score: nil,
+       generating: false
+     )}
   end
 end
