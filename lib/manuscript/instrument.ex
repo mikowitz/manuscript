@@ -5,20 +5,26 @@ defmodule Manuscript.Instrument do
     %__MODULE__{template: template, id: UUID.uuid4()}
   end
 
-  def staff(%__MODULE__{template: %{name: name, clef: "piano"}}) do
+  def staff(instrument, measures \\ "s1")
+
+  def staff(%__MODULE__{template: %{name: name, clef: "piano"}}, measures) do
     """
     \\new PianoStaff \\with {
       instrumentName = "#{name} "
+      shortInstrumentName = "#{name} "
     } <<
-      \\new Staff { \\clef "treble" s1 }
-      \\new Staff { \\clef "bass" s1 }
+      \\new Staff { \\clef "treble" #{measures} }
+      \\new Staff { \\clef "bass" #{measures} }
     >>
     """
   end
 
-  def staff(%__MODULE__{template: template}) do
+  def staff(%__MODULE__{template: template}, measures) do
     """
-    \\new Staff \\with { instrumentName = "#{template.name} " } { \\clef "#{template.clef}" s1 }
+    \\new Staff \\with {
+      instrumentName = "#{template.name} "
+      shortInstrumentName = "#{template.name} "
+    } { \\clef "#{template.clef}" #{measures} }
     """
   end
 end
