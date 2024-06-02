@@ -35,3 +35,6 @@ manuscript-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/priv/*.ly
+/priv/*.png
+/priv/*.pdf
