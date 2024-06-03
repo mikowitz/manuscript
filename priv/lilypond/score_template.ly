@@ -12,7 +12,9 @@
   padding = 0
   indent = 0
   right-margin = 0.25\in
-  left-margin = 1.7\in
+  left-margin = 1.75\in
+  top-margin = .25\in
+  bottom-margin = .25\in
   system-separator-markup = \slashSeparator
 }
 

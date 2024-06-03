@@ -8,32 +8,28 @@ defmodule Manuscript.Lilypond do
   @priv :code.priv_dir(:manuscript)
   File.mkdir_p(@priv)
 
-  def generate_lilypond(staves) do
-    content = write_lilypond(staves)
-
-    path = Path.join(@priv, "score-for-png")
-    ly = path <> ".ly"
-    png = path <> ".png"
-    :ok = File.write(ly, content)
-    {"", 0} = System.cmd("lilypond", ["-s", "--png", "--o", path, ly])
-    {:ok, image_data} = File.read(png)
-    data = "data:image/png;base64,#{Base.encode64(image_data)}"
-    :ok = File.rm(png)
-    data
+  def generate_png_data(staves) do
+    generate_data(staves, "png", "image/png")
   end
 
   def generate_pdf_data(staves) do
+    generate_data(staves, "pdf", "application/pdf")
+  end
+
+  def generate_data(staves, format, mime_type) do
+    File.mkdir_p(@priv)
     content = write_lilypond(staves)
 
-    path = Path.join(@priv, "score-for-pdf")
+    path = Path.join(@priv, "score-for-#{format}")
     ly = path <> ".ly"
-    pdf = path <> ".pdf"
+    output = path <> ".#{format}"
 
     :ok = File.write(ly, content)
-    {"", 0} = System.cmd("lilypond", ["-s", "--o", path, ly])
-    {:ok, pdf_data} = File.read(pdf)
-    data = "data:application/pdf;base64,#{Base.encode64(pdf_data)}"
-    :ok = File.rm(pdf)
+    {"", 0} = System.cmd("lilypond", ["-s", "--#{format}", "--o", path, ly])
+    {:ok, data} = File.read(output)
+    data = "data:#{mime_type};base64,#{Base.encode64(data)}"
+    :ok = File.rm(output)
+    :ok = File.rm(ly)
     data
   end
 
@@ -48,9 +44,10 @@ defmodule Manuscript.Lilypond do
 
     measures =
       case staff_count do
-        n when n < 4 -> "s1 \\break s1 \\break s1 \\break s1"
-        n when n < 6 -> "s1 \\break s1 \\break s1"
-        n when n < 9 -> "s1 \\break s1"
+        n when n <= 2 -> "s1 \\break s1 \\break s1 \\break s1 \\break s1"
+        n when n <= 4 -> "s1 \\break s1 \\break s1 \\break s1"
+        n when n <= 5 -> "s1 \\break s1 \\break s1"
+        n when n <= 9 -> "s1 \\break s1"
         _ -> "s1"
       end
 

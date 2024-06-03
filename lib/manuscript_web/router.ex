@@ -17,8 +17,7 @@ defmodule ManuscriptWeb.Router do
   scope "/", ManuscriptWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-    live "/manuscript", ManuscriptLive
+    live "/", ManuscriptLive
   end
 
   # Other scopes may use custom stacks.

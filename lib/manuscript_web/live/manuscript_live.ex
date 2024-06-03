@@ -71,7 +71,7 @@ defmodule ManuscriptWeb.ManuscriptLive do
 
   def generate_png(staves) do
     Task.async(fn ->
-      Manuscript.Lilypond.generate_lilypond(staves)
+      Manuscript.Lilypond.generate_png_data(staves)
     end)
     |> Task.await()
   end
