@@ -28,5 +28,6 @@
   \context {
     \Score
     \omit TimeSignature
+    \omit BarNumber
   }
 }

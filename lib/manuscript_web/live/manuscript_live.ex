@@ -2,7 +2,7 @@ defmodule ManuscriptWeb.ManuscriptLive do
   use ManuscriptWeb, :live_view
 
   alias Manuscript.Instrument
-  alias Manuscript.Instrument.Template
+  alias Manuscript.Score
 
   def mount(_params, _session, socket) do
     reset(socket, :ok)
@@ -13,12 +13,12 @@ defmodule ManuscriptWeb.ManuscriptLive do
   end
 
   def handle_event("autocomplete", %{"instrument" => instrument}, socket) do
-    instruments = Template.matching(instrument)
+    instruments = Score.instruments_matching(instrument)
     {:noreply, assign(socket, search_results: instruments, search_term: instrument)}
   end
 
   def handle_event("add_instrument", %{"instrument" => instrument}, socket) do
-    instrument = Template.by_name(instrument)
+    instrument = Score.instrument_by_name(instrument)
 
     if instrument do
       new_instruments =

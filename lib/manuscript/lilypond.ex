@@ -1,9 +1,7 @@
 defmodule Manuscript.Lilypond do
-  alias Manuscript.Instrument
-  {lilypond_version, 0} = System.cmd("lilypond", ["--version"])
+  alias Manuscript.Score.Instrument
 
-  [[version] | _] = Regex.scan(~r/[\d\.]+/, lilypond_version)
-  @lilypond_version version
+  @lilypond_version Application.compile_env(:manuscript, :lilypond_version, "0.0.0")
 
   @priv :code.priv_dir(:manuscript)
   File.mkdir_p(@priv)
@@ -40,7 +38,8 @@ defmodule Manuscript.Lilypond do
   end
 
   defp staff_groups(staves) do
-    staff_count = staves |> Enum.map(&Instrument.Template.staff_count(&1.template)) |> Enum.sum()
+    staff_count =
+      staves |> Enum.map(&Instrument.staff_count(&1.template)) |> Enum.sum()
 
     measures =
       case staff_count do
@@ -60,7 +59,7 @@ defmodule Manuscript.Lilypond do
         instruments ->
           """
           \\new StaffGroup <<
-            #{Enum.map_join(instruments, "\n", &Instrument.staff(&1, measures))}
+            #{Enum.map_join(instruments, "\n", &Manuscript.Instrument.staff(&1, measures))}
           >>
           """
       end

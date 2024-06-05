@@ -7,7 +7,7 @@ defmodule Manuscript.Instrument do
 
   def staff(instrument, measures \\ "s1")
 
-  def staff(%__MODULE__{template: %{name: name, clef: "piano"}}, measures) do
+  def staff(%__MODULE__{template: %{name: name, default_clef: "piano"}}, measures) do
     """
     \\new PianoStaff \\with {
       instrumentName = "#{name} "
@@ -24,15 +24,7 @@ defmodule Manuscript.Instrument do
     \\new Staff \\with {
       instrumentName = "#{template.name} "
       shortInstrumentName = "#{template.name} "
-    } { \\clef "#{template.clef}" #{measures} }
+    } { \\clef "#{template.default_clef}" #{measures} }
     """
-  end
-
-  def matching(text) do
-    query = String.replace(text, ~r/[\W\S]/, "")
-
-    Enum.filter(__MODULE__.Template.all(), fn inst ->
-      String.match?(inst, ~r/#{query}/i)
-    end)
   end
 end
