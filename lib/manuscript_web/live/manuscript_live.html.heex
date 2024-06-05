@@ -30,12 +30,12 @@
         </a>
       </div>
       <ul>
-        <%= for inst <- @instruments do %>
+        <%= for staff <- @instruments do %>
           <li class="border-2 rounded-lg px-2 py-2 mr-10 ml-2 mt-2">
-            <a href="#" phx-click="delete_instrument" phx-value-id={inst.id} class="text-red-500">
+            <a href="#" phx-click="delete_instrument" phx-value-id={staff.id} class="text-red-500">
               [x]
             </a>
-            <%= inst.template.name %>
+            <%= staff.instrument.name %>
           </li>
         <% end %>
       </ul>

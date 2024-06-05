@@ -1,8 +1,7 @@
 defmodule ManuscriptWeb.ManuscriptLive do
   use ManuscriptWeb, :live_view
 
-  alias Manuscript.Instrument
-  alias Manuscript.Score
+  alias Manuscript.{Score, Score.Staff}
 
   def mount(_params, _session, socket) do
     reset(socket, :ok)
@@ -22,8 +21,8 @@ defmodule ManuscriptWeb.ManuscriptLive do
 
     if instrument do
       new_instruments =
-        [Instrument.new(instrument) | socket.assigns.instruments]
-        |> Enum.sort_by(& &1.template.index)
+        [Staff.new(instrument) | socket.assigns.instruments]
+        |> Enum.sort_by(& &1.instrument.index)
 
       send(self(), {:generate_lilypond, new_instruments})
 
