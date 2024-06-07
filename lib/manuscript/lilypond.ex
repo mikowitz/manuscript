@@ -1,4 +1,5 @@
 defmodule Manuscript.Lilypond do
+  alias Manuscript.Score
   alias Manuscript.Score.Instrument
 
   @lilypond_version Application.compile_env(:manuscript, :lilypond_version, "0.0.0")
@@ -37,31 +38,6 @@ defmodule Manuscript.Lilypond do
   end
 
   defp staff_groups(staves) do
-    staff_count =
-      staves |> Enum.map(&Instrument.staff_count(&1.instrument)) |> Enum.sum()
-
-    measures =
-      case staff_count do
-        n when n <= 2 -> "s1 \\break s1 \\break s1 \\break s1 \\break s1"
-        n when n <= 4 -> "s1 \\break s1 \\break s1 \\break s1"
-        n when n <= 5 -> "s1 \\break s1 \\break s1"
-        n when n <= 9 -> "s1 \\break s1"
-        _ -> "s1"
-      end
-
-    Enum.chunk_by(staves, & &1.instrument.family)
-    |> Enum.map_join("\n", fn family ->
-      case family do
-        [] ->
-          ""
-
-        instruments ->
-          """
-          \\new StaffGroup <<
-            #{Enum.map_join(instruments, "\n", &Manuscript.Score.Staff.staff(&1, measures))}
-          >>
-          """
-      end
-    end)
+    Score.to_lilypond(staves)
   end
 end

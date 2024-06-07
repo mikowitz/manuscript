@@ -4,9 +4,12 @@ defmodule Manuscript.Score do
   """
 
   import Ecto.Query, warn: false
+  alias Manuscript.Score.Staff
   alias Manuscript.Repo
 
   alias Manuscript.Score.Instrument
+
+  ## PRAGMA: instruments
 
   @doc """
   Returns the list of instruments.
@@ -116,5 +119,36 @@ defmodule Manuscript.Score do
   """
   def change_instrument(%Instrument{} = instrument, attrs \\ %{}) do
     Instrument.changeset(instrument, attrs)
+  end
+
+  ## PRAGMA: score
+
+  def to_lilypond(staves) do
+    staff_count =
+      staves |> Enum.map(&Instrument.staff_count(&1.instrument)) |> Enum.sum()
+
+    measures =
+      case staff_count do
+        n when n <= 2 -> "s1 \\break s1 \\break s1 \\break s1 \\break s1"
+        n when n <= 4 -> "s1 \\break s1 \\break s1 \\break s1"
+        n when n <= 5 -> "s1 \\break s1 \\break s1"
+        n when n <= 9 -> "s1 \\break s1"
+        _ -> "s1"
+      end
+
+    Enum.chunk_by(staves, & &1.instrument.family)
+    |> Enum.map_join("\n", fn family ->
+      case family do
+        [] ->
+          ""
+
+        instruments ->
+          """
+          \\new StaffGroup <<
+            #{Enum.map_join(instruments, "\n", &Staff.to_lilypond(&1, measures))}
+          >>
+          """
+      end
+    end)
   end
 end
