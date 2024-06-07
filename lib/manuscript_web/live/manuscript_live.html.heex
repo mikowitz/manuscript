@@ -8,7 +8,7 @@
 
     <%= if @score do %>
       <.score_buttons />
-      <.instrument_list staves={@instruments} />
+      <.instrument_list staves={@staves} />
     <% end %>
   </div>
   <.score score={@score} pdf_score={@pdf_score} generating={@generating} />

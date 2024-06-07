@@ -1,13 +1,20 @@
 defmodule Manuscript.Score.Staff do
-  defstruct [:instrument, :id]
+  defstruct [:instrument, :id, :name, :clef]
 
   def new(instrument) do
-    %__MODULE__{instrument: instrument, id: UUID.uuid4()}
+    %__MODULE__{
+      instrument: instrument,
+      id: UUID.uuid4(),
+      name: instrument.name,
+      clef: instrument.default_clef
+    }
   end
+
+  def clefs, do: ~w(treble alto tenor bass percussion piano)
 
   def to_lilypond(instrument, measures \\ "s1")
 
-  def to_lilypond(%__MODULE__{instrument: %{name: name, default_clef: "piano"}}, measures) do
+  def to_lilypond(%__MODULE__{name: name, clef: "piano"}, measures) do
     """
     \\new PianoStaff \\with {
       instrumentName = "#{name} "
@@ -19,12 +26,12 @@ defmodule Manuscript.Score.Staff do
     """
   end
 
-  def to_lilypond(%__MODULE__{instrument: instrument}, measures) do
+  def to_lilypond(%__MODULE__{name: name, clef: clef}, measures) do
     """
     \\new Staff \\with {
-      instrumentName = "#{instrument.name} "
-      shortInstrumentName = "#{instrument.name} "
-    } { \\clef "#{instrument.default_clef}" #{measures} }
+      instrumentName = "#{name} "
+      shortInstrumentName = "#{name} "
+    } { \\clef "#{clef}" #{measures} }
     """
   end
 end

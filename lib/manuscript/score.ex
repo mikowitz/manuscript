@@ -124,6 +124,11 @@ defmodule Manuscript.Score do
   ## PRAGMA: score
 
   def to_lilypond(staves) do
+    staves =
+      staves
+      |> Enum.sort_by(fn s -> elem(s, 1).instrument.index end)
+      |> Enum.map(&elem(&1, 1))
+
     staff_count =
       staves |> Enum.map(&Instrument.staff_count(&1.instrument)) |> Enum.sum()
 

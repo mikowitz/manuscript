@@ -20,17 +20,18 @@ defmodule ManuscriptWeb.ManuscriptLive do
     instrument = Score.instrument_by_name(instrument)
 
     if instrument do
-      new_instruments =
-        [Staff.new(instrument) | socket.assigns.instruments]
-        |> Enum.sort_by(& &1.instrument.index)
+      staff = Staff.new(instrument)
 
-      send(self(), {:generate_lilypond, new_instruments})
+      new_staves =
+        Map.put_new(socket.assigns.staves, staff.id, staff)
+
+      send(self(), {:generate_lilypond, new_staves})
 
       {:noreply,
        assign(socket,
          search_term: "",
          search_results: [],
-         instruments: new_instruments,
+         staves: new_staves,
          generating: true
        )}
     else
@@ -39,32 +40,39 @@ defmodule ManuscriptWeb.ManuscriptLive do
   end
 
   def handle_event("update_score", _params, socket) do
-    IO.puts("OK")
+    staves =
+      socket.assigns.staves
 
     send(
       self(),
-      {:generate_lilypond,
-       socket.assigns.instruments
-       |> Enum.sort_by(& &1.instrument.index)}
+      {:generate_lilypond, staves}
     )
 
     {:noreply, assign(socket, generating: true)}
   end
 
   def handle_event("delete_instrument", %{"id" => id}, socket) do
-    instruments = socket.assigns.instruments |> Enum.reject(fn i -> i.id == id end)
-    send(self(), {:generate_lilypond, instruments})
+    staves = Map.delete(socket.assigns.staves, id)
+    send(self(), {:generate_lilypond, staves})
 
     {:noreply,
      assign(socket,
        search_term: "",
-       instruments: instruments,
-       generating: instruments != []
+       staves: staves,
+       generating: !Enum.empty?(staves)
      )}
   end
 
+  def handle_event("update_staff", params, socket) do
+    staves =
+      Map.update(socket.assigns.staves, params["id"], nil, fn staff ->
+        %{staff | name: params["name"], clef: params["clef"]}
+      end)
+
+    {:noreply, assign(socket, staves: staves)}
+  end
+
   def handle_info({:generate_lilypond, staves}, socket) do
-    IO.puts("OK")
     score = generate_png(staves)
     pdf_score = generate_pdf(staves)
 
@@ -94,7 +102,7 @@ defmodule ManuscriptWeb.ManuscriptLive do
      assign(socket,
        search_term: "",
        search_results: [],
-       instruments: [],
+       staves: %{},
        score: nil,
        pdf_score: nil,
        generating: false
@@ -158,8 +166,8 @@ defmodule ManuscriptWeb.ManuscriptLive do
   def instrument_list(assigns) do
     ~H"""
     <ul>
-      <%= for staff <- @staves do %>
-        <.instrument staff={staff} />
+      <%= for {id, staff} <- Enum.sort_by(@staves, fn s -> elem(s, 1).instrument.index end) do %>
+        <.instrument id={id} staff={staff} />
       <% end %>
     </ul>
     """
@@ -167,11 +175,27 @@ defmodule ManuscriptWeb.ManuscriptLive do
 
   def instrument(assigns) do
     ~H"""
-    <li class="border-2 rounded-lg px-2 py-2 mr-10 ml-2 mt-2">
-      <a href="#" phx-click="delete_instrument" phx-value-id={@staff.id} class="text-red-500">
+    <li id={@id} class="border-2 rounded-lg px-2 py-2 mr-10 ml-2 mt-2">
+      <a href="#" phx-click="delete_instrument" phx-value-id={@id} class="text-red-500 font-semibold">
         [x]
       </a>
-      <%= @staff.instrument.name %>
+      <.form
+        for={nil}
+        class="instrument-form"
+        phx-change="update_staff"
+        id={"form-" <> @id}
+        phx-submit="update_staff"
+      >
+        <input type="hidden" name="id" id={"id" <> @id} value={@id} />
+        <.input type="text" name="name" id={"name-" <> @id} value={@staff.name} />
+        <.input
+          type="select"
+          name="clef"
+          id={"clef-" <> @id}
+          options={Staff.clefs()}
+          value={@staff.clef}
+        />
+      </.form>
     </li>
     """
   end
