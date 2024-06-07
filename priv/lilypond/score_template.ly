@@ -20,7 +20,7 @@
 
 \score {
   <<
-  __GROUPS__
+  __SCORE__
   >>
 }
 

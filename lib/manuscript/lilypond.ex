@@ -1,6 +1,5 @@
 defmodule Manuscript.Lilypond do
   alias Manuscript.Score
-  alias Manuscript.Score.Instrument
 
   @lilypond_version Application.compile_env(:manuscript, :lilypond_version, "0.0.0")
   @priv :code.priv_dir(:manuscript)
@@ -34,10 +33,6 @@ defmodule Manuscript.Lilypond do
   def write_lilypond(staves) do
     File.read!(Path.join(:code.priv_dir(:manuscript), "lilypond/score_template.ly"))
     |> String.replace("__LILYPOND_VERSION__", @lilypond_version)
-    |> String.replace("__GROUPS__", staff_groups(staves))
-  end
-
-  defp staff_groups(staves) do
-    Score.to_lilypond(staves)
+    |> String.replace("__SCORE__", Score.to_lilypond(staves))
   end
 end
