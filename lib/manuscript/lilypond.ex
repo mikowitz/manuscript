@@ -1,10 +1,7 @@
 defmodule Manuscript.Lilypond do
-  alias Manuscript.Instrument
-  {lilypond_version, 0} = System.cmd("lilypond", ["--version"])
+  alias Manuscript.Score
 
-  [[version] | _] = Regex.scan(~r/[\d\.]+/, lilypond_version)
-  @lilypond_version version
-
+  @lilypond_version Application.compile_env(:manuscript, :lilypond_version, "0.0.0")
   @priv :code.priv_dir(:manuscript)
   File.mkdir_p(@priv)
 
@@ -36,34 +33,6 @@ defmodule Manuscript.Lilypond do
   def write_lilypond(staves) do
     File.read!(Path.join(:code.priv_dir(:manuscript), "lilypond/score_template.ly"))
     |> String.replace("__LILYPOND_VERSION__", @lilypond_version)
-    |> String.replace("__GROUPS__", staff_groups(staves))
-  end
-
-  defp staff_groups(staves) do
-    staff_count = staves |> Enum.map(&Instrument.Template.staff_count(&1.template)) |> Enum.sum()
-
-    measures =
-      case staff_count do
-        n when n <= 2 -> "s1 \\break s1 \\break s1 \\break s1 \\break s1"
-        n when n <= 4 -> "s1 \\break s1 \\break s1 \\break s1"
-        n when n <= 5 -> "s1 \\break s1 \\break s1"
-        n when n <= 9 -> "s1 \\break s1"
-        _ -> "s1"
-      end
-
-    Enum.chunk_by(staves, & &1.template.family)
-    |> Enum.map_join("\n", fn family ->
-      case family do
-        [] ->
-          ""
-
-        instruments ->
-          """
-          \\new StaffGroup <<
-            #{Enum.map_join(instruments, "\n", &Instrument.staff(&1, measures))}
-          >>
-          """
-      end
-    end)
+    |> String.replace("__SCORE__", Score.to_lilypond(staves))
   end
 end

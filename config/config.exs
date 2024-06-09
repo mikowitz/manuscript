@@ -7,6 +7,12 @@
 # General application configuration
 import Config
 
+{lilypond_version, 0} = System.cmd("lilypond", ["--version"])
+[[version] | _] = Regex.scan(~r/[\d\.]+/, lilypond_version)
+
+config :manuscript,
+  lilypond_version: version
+
 config :manuscript,
   ecto_repos: [Manuscript.Repo],
   generators: [timestamp_type: :utc_datetime]

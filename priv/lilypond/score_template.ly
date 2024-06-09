@@ -20,7 +20,7 @@
 
 \score {
   <<
-  __GROUPS__
+  __SCORE__
   >>
 }
 
@@ -28,5 +28,6 @@
   \context {
     \Score
     \omit TimeSignature
+    \omit BarNumber
   }
 }
