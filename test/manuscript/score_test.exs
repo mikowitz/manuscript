@@ -21,7 +21,12 @@ defmodule Manuscript.ScoreTest do
     end
 
     test "create_instrument/1 with valid data creates a instrument" do
-      valid_attrs = %{index: 42, name: "some name", family: "some family", default_clef: "some default_clef"}
+      valid_attrs = %{
+        index: 42,
+        name: "some name",
+        family: "some family",
+        default_clef: "some default_clef"
+      }
 
       assert {:ok, %Instrument{} = instrument} = Score.create_instrument(valid_attrs)
       assert instrument.index == 42
@@ -36,7 +41,13 @@ defmodule Manuscript.ScoreTest do
 
     test "update_instrument/2 with valid data updates the instrument" do
       instrument = instrument_fixture()
-      update_attrs = %{index: 43, name: "some updated name", family: "some updated family", default_clef: "some updated default_clef"}
+
+      update_attrs = %{
+        index: 43,
+        name: "some updated name",
+        family: "some updated family",
+        default_clef: "some updated default_clef"
+      }
 
       assert {:ok, %Instrument{} = instrument} = Score.update_instrument(instrument, update_attrs)
       assert instrument.index == 43
