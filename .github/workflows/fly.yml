@@ -1,8 +1,12 @@
 name: Fly Deploy
 on:
-  push:
+  workflow_run:
+    workflows: ["Elixir CI"]
+    types:
+      - completed
     branches:
       - main
+
 jobs:
   deploy:
     name: Deploy app
